@@ -1,0 +1,36 @@
+'use client';
+
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stage } from '@react-three/drei';
+import { Suspense, lazy } from 'react';
+
+const Model = lazy(() => import('./Model'));
+
+interface SceneProps {
+  modelUrl?: string;
+  className?: string;
+  cameraPosition?: [number, number, number];
+  cameraFov?: number;
+  modelScale?: number;
+}
+
+export default function Scene({ modelUrl, className, cameraPosition, cameraFov, modelScale }: SceneProps) {
+  return (
+    <div className={`relative w-full h-full ${className}`}>
+      <Canvas shadows dpr={[1, 2]} camera={{ fov: cameraFov ?? 45, position: cameraPosition ?? [0, 0, 10] }}>
+        <Suspense fallback={null}>
+          <Stage environment="city" intensity={0.6}>
+            <Model modelUrl={modelUrl} scale={modelScale} />
+          </Stage>
+          <OrbitControls 
+             makeDefault 
+             autoRotate 
+             autoRotateSpeed={0.5}
+             minPolarAngle={0} 
+             maxPolarAngle={Math.PI / 1.5}
+          />
+        </Suspense>
+      </Canvas>
+    </div>
+  );
+}
