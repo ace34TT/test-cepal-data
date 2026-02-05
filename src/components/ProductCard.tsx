@@ -2,7 +2,7 @@
 
 import {useState} from 'react';
 import Image from 'next/image';
-import {Plus} from 'lucide-react';
+import Link from 'next/link';
 import {formatPrice} from "@/lib/currencies";
 
 interface FrameColor {
@@ -59,11 +59,12 @@ export function ProductCard({product}: { product: Product }) {
             </p>
           </div>
 
-          <button
+          <Link
+              href={`/frames/${product.id}`}
               className="bg-[#1A1A1A] text-white rounded-full px-4 py-2 flex items-center gap-1.5 hover:bg-black transition-colors shrink-0">
             {/*<Plus size={16}/>*/}
             <span className="text-sm font-semibold">Voir</span>
-          </button>
+          </Link>
         </div>
 
         <div className="mb-6">
