@@ -139,6 +139,7 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
                     (product.threeD as unknown as ThreeDConfig).camera!.position!.y,
                     (product.threeD as unknown as ThreeDConfig).camera!.position!.z
                  ] : undefined}
+                  modelColor={colors.find(c => c.id === selectedColor)?.hex}
                />
                
                {!product.isAvailable && (
