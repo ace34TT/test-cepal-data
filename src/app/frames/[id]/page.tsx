@@ -22,6 +22,7 @@ interface LensType {
   id: string;
   label: string;
   price: number;
+  color?: string;
 }
 
 interface ProductConfiguration {
@@ -140,6 +141,7 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
                     (product.threeD as unknown as ThreeDConfig).camera!.position!.z
                  ] : undefined}
                   modelColor={colors.find(c => c.id === selectedColor)?.hex}
+                  lensColor={lensTypes.find(l => l.id === selectedLens)?.color}
                />
                
                {!product.isAvailable && (
@@ -245,7 +247,10 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
                         {lensTypes.map((lens) => (
                           <button
                             key={lens.id}
-                            onClick={() => setSelectedLens(lens.id)}
+                            onClick={() => {
+                              setSelectedLens(lens.id)
+                              console.log(lens)
+                            }}
                             className={`flex justify-between items-center p-4 rounded-xl border-2 transition-all ${
                               selectedLens === lens.id
                               ? 'border-black bg-gray-50'

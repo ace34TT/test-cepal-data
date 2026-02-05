@@ -13,15 +13,16 @@ interface SceneProps {
   cameraFov?: number;
   modelScale?: number;
   modelColor?: string;
+  lensColor?: string;
 }
 
-export default function Scene({ modelUrl, className, cameraPosition, cameraFov, modelScale, modelColor }: SceneProps) {
+export default function Scene({ modelUrl, className, cameraPosition, cameraFov, modelScale, modelColor, lensColor }: SceneProps) {
   return (
     <div className={`relative w-full h-full ${className}`}>
       <Canvas shadows dpr={[1, 2] as [number, number]} camera={{ fov: cameraFov ?? 45, position: cameraPosition ?? [0, 0, 10] }}>
         <Suspense fallback={null}>
           <Stage environment="city" intensity={0.6}>
-            <Model modelUrl={modelUrl} scale={modelScale} color={modelColor} />
+            <Model modelUrl={modelUrl} scale={modelScale} color={modelColor} lensColor={lensColor} />
           </Stage>
           <OrbitControls 
              makeDefault 
