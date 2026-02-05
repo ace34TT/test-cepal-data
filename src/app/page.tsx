@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import {ProductCard} from "@/components/ProductCard";
-import {Frame} from "@prisma/client"; // Ton typage TypeScript
+import {Frame} from "@prisma/client";
 
 export default function ProductList() {
   const [products, setProducts] = useState<Frame[]>([]);
@@ -28,7 +28,7 @@ export default function ProductList() {
   if (error) return <p>Erreur lors du chargement.</p>;
 
   return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 container mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 container mx-auto pb-10">
         {products.map((product) => (
             <ProductCard key={product.id} product={product} />
         ))}

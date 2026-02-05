@@ -1,4 +1,9 @@
+'use client'
+
+import {useState} from 'react';
 import Image from 'next/image';
+import {Plus} from 'lucide-react';
+import {formatPrice} from "@/lib/currencies";
 
 interface FrameColor {
   id: string;
@@ -8,7 +13,6 @@ interface FrameColor {
 
 interface ProductConfiguration {
   frameColors?: FrameColor[];
-  lensTypes?: any[];
 }
 
 interface Product {
@@ -22,62 +26,64 @@ interface Product {
   configurations: any;
 }
 
-interface ProductCardProps {
-  product: Product;
-}
-
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({product}: { product: Product }) {
+  const [imgSrc, setImgSrc] = useState(product.thumbnail || 'https://placehold.net/400x400.png');
   const config = product.configurations as ProductConfiguration;
   const colors = config?.frameColors || [];
 
   return (
-    <div className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-      <div className="aspect-square relative flex items-center justify-center bg-gray-100 p-4">
-        {product.thumbnail ? (
-          <div className="relative w-full h-full">
-            <Image
-              src={product.thumbnail}
-              alt={product.name || 'Product Image'}
+      <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-50 flex flex-col h-full max-w-sm">
+        <div className="relative aspect-4/3 mb-6 overflow-hidden rounded-4xl">
+          <Image
+              src={imgSrc}
+              alt={product.name || 'Product'}
               fill
-              className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-        ) : (
-          <div className="text-gray-400">No Image</div>
-        )}
-        {!product.isAvailable && (
-          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-            Out of Stock
-          </div>
-        )}
-      </div>
-      
-      <div className="p-3 flex flex-col flex-grow">
-        <div className="text-xs text-gray-500 mb-1">{product.brand}</div>
-        <h2 className="text-base font-semibold text-gray-900 mb-1 truncate" title={product.name || ''}>
-          {product.name}
-        </h2>
-        
-        {/* Colors Section */}
-        {colors.length > 0 && (
-          <div className="flex gap-1.5 mb-2">
-            {colors.map((color) => (
-              <div 
-                key={color.id}
-                className="w-4 h-4 rounded-full border border-gray-300 shadow-sm"
-                style={{ backgroundColor: color.hex }}
-                title={color.label}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className="mt-auto">
-          <p className="text-base font-bold text-gray-900">
-            {product.price.toLocaleString()} {product.currency}
-          </p>
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              onError={() => setImgSrc('https://placehold.net/400x400.png')}
+          />
+          {!product.isAvailable && (
+              <div
+                  className="absolute top-4 right-4 bg-black/70 text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full backdrop-blur-md">
+                Epuisé
+              </div>
+          )}
         </div>
+
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex-1 pr-4">
+            <h2 className="text-[#1A1A1A] text-xl font-bold leading-tight mb-1">
+              {product.name}
+            </h2>
+            <p className="text-[#999999] text-sm font-medium uppercase tracking-wider">
+              {product.brand}
+            </p>
+          </div>
+
+          <button
+              className="bg-[#1A1A1A] text-white rounded-full px-4 py-2 flex items-center gap-1.5 hover:bg-black transition-colors shrink-0">
+            {/*<Plus size={16}/>*/}
+            <span className="text-sm font-semibold">Voir</span>
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <span className="text-[#1A1A1A] text-xl font-bold">
+            {formatPrice(product.price, product.currency)}
+          </span>
+        </div>
+
+        {colors.length > 0 && (
+            <div className="flex gap-3">
+              {colors.map((color) => (
+                  <button
+                      key={color.id}
+                      title={color.label}
+                      className="w-8 h-8 rounded-full border-2 border-white ring-1 ring-gray-100 shadow-sm transition-transform hover:scale-110"
+                      style={{backgroundColor: color.hex}}
+                  />
+              ))}
+            </div>
+        )}
       </div>
-    </div>
   );
 }
