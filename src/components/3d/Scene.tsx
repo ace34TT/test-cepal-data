@@ -17,7 +17,7 @@ interface SceneProps {
 export default function Scene({ modelUrl, className, cameraPosition, cameraFov, modelScale }: SceneProps) {
   return (
     <div className={`relative w-full h-full ${className}`}>
-      <Canvas shadows dpr={[1, 2]} camera={{ fov: cameraFov ?? 45, position: cameraPosition ?? [0, 0, 10] }}>
+      <Canvas shadows dpr={[1, 2] as [number, number]} camera={{ fov: cameraFov ?? 45, position: cameraPosition ?? [0, 0, 10] }}>
         <Suspense fallback={null}>
           <Stage environment="city" intensity={0.6}>
             <Model modelUrl={modelUrl} scale={modelScale} />

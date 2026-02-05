@@ -1,11 +1,16 @@
 'use client';
 
 import { useEffect, useState, use } from 'react';
-import Image from 'next/image';
 import { Frame } from '@prisma/client';
 import { formatPrice } from '@/lib/currencies';
 import { ArrowLeft, Check, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const Scene = dynamic(() => import('@/components/3d/Scene'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-3xl"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div></div>
+});
 
 interface FrameColor {
   id: string;
@@ -31,8 +36,20 @@ interface Dimensions {
   unit: string;
 }
 
-export default function FrameDetailPage({ params }: { params: Promise<{ id: string }> }) {
+interface ThreeDConfig {
+  scale?: number;
+  camera?: {
+    fov?: number;
+    position?: {
+      x: number;
+      y: number;
+      z: number;
+    };
+  };
+  modelUrl?: string;
+}
 
+export default function FrameDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const { id } = resolvedParams;
 
@@ -101,7 +118,7 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
   const totalPrice = product.price + currentLensPrice;
 
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
         <Link href="/" className="inline-flex items-center text-gray-500 hover:text-black mb-8 transition-colors">
           <ArrowLeft size={20} className="mr-2" />
@@ -111,22 +128,21 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             
-            <div className="bg-gray-100 p-8 flex items-center justify-center relative min-h-100 lg:min-h-150">
-              {product.thumbnail ? (
-                <div className="relative w-full h-full max-w-lg aspect-square">
-                  <Image
-                    src={product.thumbnail}
-                    alt={product.name || 'Product Image'}
-                    fill
-                    className="object-contain mix-blend-multiply"
-                    priority
-                  />
-                </div>
-              ) : (
-                <div className="text-gray-400 text-xl">Image non disponible</div>
-              )}
-              {!product.isAvailable && (
-                <div className="absolute top-8 right-8 bg-black/80 text-white px-4 py-2 rounded-full uppercase tracking-widest text-sm font-bold backdrop-blur-md">
+            <div className="bg-gray-100 h-125 lg:h-240 relative">
+               <Scene 
+                 className="w-full h-full"
+                 modelUrl="/models/glasses_09.glb"
+                 modelScale={(product.threeD as unknown as ThreeDConfig)?.scale}
+                 cameraFov={(product.threeD as unknown as ThreeDConfig)?.camera?.fov}
+                 cameraPosition={(product.threeD as unknown as ThreeDConfig)?.camera?.position ? [
+                    (product.threeD as unknown as ThreeDConfig).camera!.position!.x,
+                    (product.threeD as unknown as ThreeDConfig).camera!.position!.y,
+                    (product.threeD as unknown as ThreeDConfig).camera!.position!.z
+                 ] : undefined}
+               />
+               
+               {!product.isAvailable && (
+                <div className="absolute top-8 right-8 bg-black/80 text-white px-4 py-2 rounded-full uppercase tracking-widest text-sm font-bold z-10 backdrop-blur-md">
                   Épuisé
                 </div>
               )}
@@ -138,7 +154,7 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-6">{product.name}</h1>
               
-              <div className="text-xl font-bold text-gray-900 mb-8">
+              <div className="text-3xl font-bold text-gray-900 mb-8">
                 {formatPrice(totalPrice, product.currency)}
                 {currentLensPrice > 0 && <span className="text-sm font-normal text-gray-500 ml-2">(incl. verres)</span>}
               </div>
@@ -193,11 +209,7 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
               <div className="space-y-8 mb-10">
                 {colors.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-4">Couleur {selectedColor && (
-                        <>
-                           (<span className="font-medium text-gray-900">{colors.find(c => c.id === selectedColor)?.label}</span>)
-                        </>
-                    )}</h3>
+                    <h3 className="text-sm font-medium text-gray-900 mb-4">Couleur</h3>
                     <div className="flex flex-wrap gap-3">
                       {colors.map((color) => (
                         <button
@@ -217,7 +229,11 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
                         </button>
                       ))}
                     </div>
-
+                    {selectedColor && (
+                       <p className="mt-2 text-sm text-gray-500">
+                         Sélectionné: <span className="font-medium text-gray-900">{colors.find(c => c.id === selectedColor)?.label}</span>
+                       </p>
+                    )}
                   </div>
                 )}
 
@@ -252,7 +268,7 @@ export default function FrameDetailPage({ params }: { params: Promise<{ id: stri
                   className="w-full bg-black text-white h-14 rounded-full font-bold text-lg hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <ShoppingBag size={20} />
-                  {product.isAvailable ? 'Essayer cette monture' : 'Indisponible'}
+                  {product.isAvailable ? 'Ajouter au panier' : 'Indisponible'}
                  </button>
               </div>
 
