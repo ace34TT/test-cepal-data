@@ -49,6 +49,19 @@ export default function Model({modelUrl = '/models/glasses_09.glb', color, lensC
           }
         }
       });
+    } else {
+        scene.traverse((child) => {
+        if ((child as Mesh).isMesh) {
+          const mesh = child as Mesh;
+          if (mesh.name === 'Object_4') {
+            if (mesh.material instanceof MeshStandardMaterial) {
+              mesh.material.color.set('#ffffff');
+              mesh.material.transparent = true;
+              mesh.material.opacity = 0.3;
+            }
+          }
+        }
+      });
     }
   }, [scene, color, lensColor]);
 
